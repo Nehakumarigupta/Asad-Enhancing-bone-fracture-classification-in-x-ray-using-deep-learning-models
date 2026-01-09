@@ -1,0 +1,300 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('home')}}">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{url_for('about')}}">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('prediction')}}">
+            <i class="fas fa-x-ray"></i> Prediction
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('chatbot')}}">
+            <i class="fas fa-robot"></i> AI Assistant
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('index')}}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<style>
+    .about-section {
+        min-height: 100vh;
+        padding: 100px 20px 50px;
+    }
+
+    .about-hero {
+        background: white;
+        border-radius: 25px;
+        padding: 60px;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .about-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.5rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+
+    .about-subtitle {
+        font-size: 1.5rem;
+        color: var(--secondary-color);
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+
+    .about-description {
+        font-size: 1.15rem;
+        color: #555;
+        line-height: 1.9;
+        text-align: justify;
+        margin-bottom: 30px;
+    }
+
+    .methodology-section {
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        margin: 40px 0;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .methodology-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .methodology-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .method-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .method-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .method-icon {
+        font-size: 3.5rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .method-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+
+    .method-description {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.7;
+    }
+
+    .benefits-section {
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        margin: 40px 0;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .benefits-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .benefit-item {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px 30px;
+        margin: 15px 0;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .benefit-item:hover {
+        transform: translateX(10px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .benefit-icon {
+        font-size: 2rem;
+        min-width: 50px;
+    }
+
+    .quote-section {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 60px;
+        border-radius: 25px;
+        text-align: center;
+        margin: 40px 0;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .quote-text {
+        font-size: 1.8rem;
+        font-style: italic;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .quote-author {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+</style>
+
+<section class="about-section">
+    <div class="container">
+        <div class="about-hero">
+            <h1 class="about-title">About Our System</h1>
+            <p class="about-subtitle">
+                <i class="fas fa-heartbeat"></i> Transforming Medical Diagnostics Through AI Innovation
+            </p>
+            <p class="about-description">
+                The topic of bone fracture classification using deep learning is chosen due to its significant impact on medical diagnostics and the growing potential of artificial intelligence in healthcare [web:5]. Manual interpretation of X-ray images can be challenging, especially in settings with limited medical expertise or high patient loads. Automating this process using deep learning can assist healthcare professionals in making faster and more accurate decisions, ultimately improving patient outcomes and reducing diagnostic errors.
+            </p>
+            <p class="about-description">
+                This project explores how deep learning architectures, such as VGG19, MobileNet, EfficientNet, and DenseNet, can be enhanced with classifiers like SVM and Random Forest [web:3]. Our hybrid approach combines the feature extraction capabilities of convolutional neural networks with the classification power of ensemble methods, resulting in superior performance compared to traditional single-model approaches. The topic aligns with current trends in AI-driven medical research and provides a valuable learning experience in combining machine learning models with practical healthcare applications.
+            </p>
+        </div>
+
+        <div class="methodology-section">
+            <h2 class="methodology-title">
+                <i class="fas fa-cogs"></i> Our Methodology
+            </h2>
+            <p style="text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 40px;">
+                A comprehensive hybrid approach combining deep learning with traditional machine learning techniques
+            </p>
+
+            <div class="methodology-grid">
+                <div class="method-card">
+                    <div class="method-icon"><i class="fas fa-layer-group"></i></div>
+                    <h3 class="method-title">VGG19 Feature Extraction</h3>
+                    <p class="method-description">
+                        We utilize the pre-trained VGG19 deep convolutional neural network to extract high-level features from X-ray images. This architecture, with its 19 layers, captures intricate patterns and structural details essential for accurate fracture identification.
+                    </p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-icon"><i class="fas fa-tree"></i></div>
+                    <h3 class="method-title">Random Forest Classification</h3>
+                    <p class="method-description">
+                        The extracted features are fed into a Random Forest classifier, an ensemble learning method that combines multiple decision trees to achieve robust and reliable fracture type classification with reduced overfitting.
+                    </p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-icon"><i class="fas fa-chart-bar"></i></div>
+                    <h3 class="method-title">Feature Scaling & Optimization</h3>
+                    <p class="method-description">
+                        StandardScaler normalization ensures that extracted features are properly scaled, improving model convergence and classification performance. Hyperparameter tuning optimizes accuracy across all fracture categories.
+                    </p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-icon"><i class="fas fa-brain"></i></div>
+                    <h3 class="method-title">AI-Powered Chatbot</h3>
+                    <p class="method-description">
+                        Our Gemini 2.5 Flash-powered chatbot provides real-time medical information, answers questions about fracture types, treatment options, and assists healthcare professionals with diagnostic insights [web:6].
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="benefits-section">
+            <h2 class="methodology-title">
+                <i class="fas fa-check-circle"></i> Key Benefits & Impact
+            </h2>
+            <ul class="benefits-list">
+                <li class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <strong>Rapid Diagnosis:</strong> Reduces diagnostic time from minutes to seconds, enabling faster treatment decisions and improved emergency response
+                    </div>
+                </li>
+                <li class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-bullseye"></i></div>
+                    <div>
+                        <strong>High Accuracy:</strong> Achieves 95%+ classification accuracy across 10 fracture types, minimizing misdiagnosis and ensuring reliable results
+                    </div>
+                </li>
+                <li class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-hospital"></i></div>
+                    <div>
+                        <strong>Clinical Support:</strong> Assists healthcare professionals in resource-limited settings and high-volume emergency departments
+                    </div>
+                </li>
+                <li class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-globe"></i></div>
+                    <div>
+                        <strong>Accessibility:</strong> Web-based platform enables remote diagnosis and telemedicine applications, expanding healthcare access globally
+                    </div>
+                </li>
+                <li class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div>
+                        <strong>Consistent Performance:</strong> AI maintains diagnostic accuracy regardless of time, fatigue, or workload, ensuring reliable 24/7 operation
+                    </div>
+                </li>
+                <li class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div>
+                        <strong>Educational Tool:</strong> Serves as a training resource for medical students and radiologists to learn fracture classification patterns
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="quote-section">
+            <p class="quote-text">
+                <i class="fas fa-quote-left"></i>
+                Smart X-rays: Enhancing Fracture Detection through AI - Where Technology Meets Compassionate Care
+                <i class="fas fa-quote-right"></i>
+            </p>
+            <p class="quote-author">— BoneCare AI Research Team</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

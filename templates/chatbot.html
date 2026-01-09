@@ -1,0 +1,747 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('home')}}">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('about')}}">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('prediction')}}">
+            <i class="fas fa-x-ray"></i> Prediction
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{url_for('chatbot')}}">
+            <i class="fas fa-robot"></i> AI Assistant
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('index')}}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<style>
+    .chatbot-section {
+        min-height: 100vh;
+        padding: 100px 20px 50px;
+    }
+
+    .chatbot-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .chatbot-header {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .chatbot-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .chatbot-title-icon {
+        font-size: 3.5rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .chatbot-subtitle {
+        font-size: 1.2rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(40, 167, 69, 0.2);
+        border: 2px solid #28a745;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        color: #28a745;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        background: #28a745;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(40, 167, 69, 0); }
+    }
+
+    .chat-container {
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        animation: slideUp 0.8s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .chat-header {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 25px 35px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .chat-avatar {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-header-info h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .chat-header-info p {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    .chat-messages-area {
+        background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+        padding: 30px;
+        height: 500px;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .chat-messages-area::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .chat-messages-area::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+
+    .chat-messages-area::-webkit-scrollbar-thumb {
+        background: var(--secondary-color);
+        border-radius: 10px;
+    }
+
+    .chat-messages-area::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+    }
+
+    .welcome-screen {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .welcome-icon {
+        font-size: 6rem;
+        color: var(--secondary-color);
+        margin-bottom: 25px;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+
+    .welcome-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 30px;
+    }
+
+    .quick-suggestions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        margin-top: 30px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .suggestion-btn {
+        background: white;
+        border: 2px solid var(--accent-color);
+        padding: 15px 20px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .suggestion-btn:hover {
+        background: var(--gradient-primary);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(44, 95, 124, 0.3);
+        border-color: transparent;
+    }
+
+    .suggestion-icon {
+        font-size: 1.3rem;
+    }
+
+    .message-wrapper {
+        margin-bottom: 20px;
+        animation: messageSlide 0.3s ease;
+        overflow: auto;
+    }
+
+    @keyframes messageSlide {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .user-message {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 20px 20px 5px 20px;
+        margin-left: auto;
+        max-width: 70%;
+        float: right;
+        clear: both;
+        word-wrap: break-word;
+        box-shadow: 0 3px 15px rgba(44, 95, 124, 0.3);
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+
+    .bot-message {
+        background: white;
+        color: #333;
+        padding: 15px 20px;
+        border-radius: 20px 20px 20px 5px;
+        margin-right: auto;
+        max-width: 70%;
+        float: left;
+        clear: both;
+        word-wrap: break-word;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--accent-color);
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        color: #999;
+        margin-top: 5px;
+        text-align: right;
+    }
+
+    .chat-input-container {
+        background: white;
+        padding: 25px 30px;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .chat-input-wrapper {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .chat-input {
+        flex: 1;
+        padding: 16px 25px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50px;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+        background: #f8f9fa;
+    }
+
+    .chat-input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(111, 190, 219, 0.15);
+    }
+
+    .chat-btn {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        padding: 16px 35px;
+        border-radius: 50px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(44, 95, 124, 0.4);
+    }
+
+    .chat-btn:active {
+        transform: translateY(0);
+    }
+
+    .clear-btn {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 16px 30px;
+    }
+
+    .clear-btn:hover {
+        box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .loading-indicator {
+        display: none;
+        text-align: center;
+        margin-top: 15px;
+        color: white;
+        background: rgba(44, 95, 124, 0.9);
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-size: 1rem;
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+    }
+
+    .typing-dots {
+        display: inline-flex;
+        gap: 5px;
+        margin-left: 8px;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+        animation: dotBounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes dotBounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+
+    .info-banner {
+        background: rgba(255, 193, 7, 0.15);
+        border: 2px solid #ffc107;
+        padding: 15px 20px;
+        border-radius: 15px;
+        margin-top: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: #856404;
+        font-size: 0.9rem;
+    }
+
+    .info-icon {
+        font-size: 1.3rem;
+        min-width: 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .chatbot-title {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chatbot-title-icon {
+            font-size: 2.5rem;
+        }
+
+        .chat-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .chat-header-left {
+            flex-direction: column;
+        }
+
+        .chat-messages-area {
+            height: 400px;
+            padding: 20px;
+        }
+
+        .user-message, .bot-message {
+            max-width: 85%;
+            font-size: 1rem;
+        }
+
+        .chat-input-wrapper {
+            flex-direction: column;
+        }
+
+        .chat-btn, .clear-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .quick-suggestions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="chatbot-section">
+    <div class="chatbot-wrapper">
+        <!-- Header Section -->
+        <div class="chatbot-header">
+            <h1 class="chatbot-title">
+                <i class="fas fa-robot chatbot-title-icon"></i>
+                <span>AI Medical Assistant</span>
+            </h1>
+            <p class="chatbot-subtitle">
+                Powered by Gemini 2.5 Flash
+                <span class="status-badge">
+                    <span class="status-indicator"></span>
+                    Online
+                </span>
+            </p>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="chat-header-info">
+                        <h3>BoneCare Assistant</h3>
+                        <p>Your AI-powered medical expert</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; font-size: 0.85rem; opacity: 0.9;">
+                        <i class="fas fa-shield-alt"></i> Secure & Private
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div id="chatMessages" class="chat-messages-area">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h2 class="welcome-title">Welcome to BoneCare AI Assistant!</h2>
+                    <p class="welcome-text">
+                        👋 Hello! I'm your AI-powered medical assistant, powered by Gemini 2.5 Flash. 
+                        Ask me anything about bone fractures, medical imaging, treatment options, or general healthcare questions [web:14][web:16]!
+                    </p>
+
+                    <!-- Quick Suggestions -->
+                    <div class="quick-suggestions">
+                        <button class="suggestion-btn" onclick="sendQuickQuestion('What are the different types of bone fractures?')">
+                            <i class="fas fa-bone suggestion-icon"></i>
+                            <span>Fracture Types</span>
+                        </button>
+                        <button class="suggestion-btn" onclick="sendQuickQuestion('How long does a fracture take to heal?')">
+                            <i class="fas fa-clock suggestion-icon"></i>
+                            <span>Healing Time</span>
+                        </button>
+                        <button class="suggestion-btn" onclick="sendQuickQuestion('What is the treatment for spiral fractures?')">
+                            <i class="fas fa-pills suggestion-icon"></i>
+                            <span>Treatment Info</span>
+                        </button>
+                        <button class="suggestion-btn" onclick="sendQuickQuestion('When should I see a doctor for a bone injury?')">
+                            <i class="fas fa-user-md suggestion-icon"></i>
+                            <span>Medical Advice</span>
+                        </button>
+                    </div>
+
+                    <div class="info-banner">
+                        <i class="fas fa-info-circle info-icon"></i>
+                        <div>
+                            <strong>Medical Disclaimer:</strong> This AI assistant provides general information only. 
+                            Always consult qualified healthcare professionals for medical diagnosis and treatment decisions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input 
+                        type="text" 
+                        id="userInput" 
+                        class="chat-input" 
+                        placeholder="Type your question here... (e.g., What is a comminuted fracture?)" 
+                        autocomplete="off"
+                    >
+                    <button onclick="sendMessage()" class="chat-btn">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                    <button onclick="clearChat()" class="clear-btn">
+                        <i class="fas fa-trash-alt"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                    <i class="fas fa-robot"></i> AI is thinking
+                    <span class="typing-dots">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+
+    // Clear welcome message on first interaction
+    let isFirstMessage = true;
+
+    // Send message on Enter key
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Auto-focus input
+    userInput.focus();
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        
+        if (!message) {
+            userInput.focus();
+            return;
+        }
+
+        // Clear welcome message on first interaction
+        if (isFirstMessage) {
+            chatMessages.innerHTML = '';
+            isFirstMessage = false;
+        }
+
+        // Add user message to chat
+        addMessage(message, 'user');
+        userInput.value = '';
+
+        // Show loading indicator
+        loadingIndicator.style.display = 'inline-block';
+
+        try {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            
+            // Hide loading indicator
+            loadingIndicator.style.display = 'none';
+
+            if (data.status === 'success') {
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage('⚠️ Error: ' + (data.error || 'Something went wrong. Please try again.'), 'bot');
+            }
+        } catch (error) {
+            loadingIndicator.style.display = 'none';
+            addMessage('⚠️ Error: Unable to connect to the server. Please check your connection.', 'bot');
+            console.error('Error:', error);
+        }
+    }
+
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+        
+        // Format bot messages with line breaks
+        if (sender === 'bot') {
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+        } else {
+            messageDiv.textContent = text;
+        }
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.alignItems = sender === 'user' ? 'flex-end' : 'flex-start';
+        
+        wrapper.appendChild(messageDiv);
+        
+        // Add timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = getCurrentTime();
+        timeDiv.style.marginTop = '5px';
+        timeDiv.style.fontSize = '0.75rem';
+        timeDiv.style.color = '#999';
+        wrapper.appendChild(timeDiv);
+        
+        chatMessages.appendChild(wrapper);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function sendQuickQuestion(question) {
+        userInput.value = question;
+        sendMessage();
+    }
+
+    async function clearChat() {
+        if (!confirm('Are you sure you want to clear the entire chat history? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/clear_chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                chatMessages.innerHTML = `
+                    <div class="welcome-screen">
+                        <div class="welcome-icon" style="color: #28a745;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="welcome-title">Chat Cleared Successfully!</h2>
+                        <p class="welcome-text">
+                            Your conversation history has been cleared. Feel free to start a new conversation 
+                            by asking any questions about bone fractures or medical topics.
+                        </p>
+                    </div>
+                `;
+                isFirstMessage = true;
+            }
+        } catch (error) {
+            alert('Error clearing chat. Please try again.');
+            console.error('Error:', error);
+        }
+    }
+</script>
+{% endblock %}

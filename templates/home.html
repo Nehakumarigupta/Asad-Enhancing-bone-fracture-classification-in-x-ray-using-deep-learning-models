@@ -1,0 +1,326 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+        <a class="nav-link active" href="{{url_for('home')}}">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('about')}}">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('prediction')}}">
+            <i class="fas fa-x-ray"></i> Prediction
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('chatbot')}}">
+            <i class="fas fa-robot"></i> AI Assistant
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('index')}}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-section {
+        min-height: 100vh;
+        padding: 100px 20px 50px;
+    }
+
+    .welcome-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        padding: 50px;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 40px;
+        text-align: center;
+        animation: slideInDown 0.8s ease;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .welcome-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 40px 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 35px;
+        box-shadow: var(--shadow-md);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--gradient-primary);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .action-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .action-card:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .action-card-icon {
+        font-size: 5rem;
+        margin-bottom: 25px;
+    }
+
+    .action-card-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+
+    .action-card-description {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 25px;
+    }
+
+    .action-btn {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 12px 35px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(44, 95, 124, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .fracture-types-section {
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        margin: 50px 0;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 40px;
+    }
+
+    .fracture-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .fracture-badge {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .fracture-badge:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+</style>
+
+<section class="dashboard-section">
+    <div class="container">
+        <div class="welcome-card">
+            <h1 class="welcome-title">Welcome Back, Medical Professional!</h1>
+            <p class="welcome-subtitle">
+                <i class="fas fa-stethoscope"></i> Your AI-Powered Diagnostic Dashboard
+            </p>
+            <p style="color: #777; font-size: 1.05rem;">
+                Access advanced bone fracture classification tools powered by state-of-the-art deep learning models. Our system combines VGG19 feature extraction with Random Forest classification to deliver accurate, reliable fracture diagnoses in real-time [web:2].
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-x-ray"></i></div>
+                <div class="stat-number">10</div>
+                <div class="stat-label">Fracture Types Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-number">95%+</div>
+                <div class="stat-label">Classification Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <div class="stat-number">&lt;2s</div>
+                <div class="stat-label">Average Processing Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-robot"></i></div>
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">AI Assistant Available</div>
+            </div>
+        </div>
+
+        <div class="action-cards">
+            <div class="action-card" onclick="window.location.href='{{url_for('prediction')}}'">
+                <div class="action-card-icon" style="color: #4A90A4;">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3 class="action-card-title">Upload X-Ray</h3>
+                <p class="action-card-description">
+                    Upload an X-ray image to receive instant AI-powered fracture classification and detailed diagnostic insights
+                </p>
+                <a href="{{url_for('prediction')}}" class="action-btn">
+                    Start Analysis <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="action-card" onclick="window.location.href='{{url_for('chatbot')}}'">
+                <div class="action-card-icon" style="color: #6FBEDB;">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="action-card-title">AI Medical Assistant</h3>
+                <p class="action-card-description">
+                    Consult our AI chatbot powered by Gemini 2.5 Flash for medical information, fracture guidance, and treatment insights
+                </p>
+                <a href="{{url_for('chatbot')}}" class="action-btn">
+                    Chat Now <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="action-card" onclick="window.location.href='{{url_for('about')}}'">
+                <div class="action-card-icon" style="color: #2C5F7C;">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h3 class="action-card-title">Learn More</h3>
+                <p class="action-card-description">
+                    Discover how our hybrid deep learning approach enhances fracture detection and improves diagnostic accuracy
+                </p>
+                <a href="{{url_for('about')}}" class="action-btn">
+                    Read More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="fracture-types-section">
+            <h2 class="section-title">
+                <i class="fas fa-bone"></i> Supported Fracture Classifications
+            </h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1rem;">
+                Our AI system accurately identifies and classifies these 10 distinct bone fracture types:
+            </p>
+            <div class="fracture-grid">
+                <div class="fracture-badge">Avulsion Fracture</div>
+                <div class="fracture-badge">Comminuted Fracture</div>
+                <div class="fracture-badge">Fracture Dislocation</div>
+                <div class="fracture-badge">Greenstick Fracture</div>
+                <div class="fracture-badge">Hairline Fracture</div>
+                <div class="fracture-badge">Impacted Fracture</div>
+                <div class="fracture-badge">Longitudinal Fracture</div>
+                <div class="fracture-badge">Oblique Fracture</div>
+                <div class="fracture-badge">Pathological Fracture</div>
+                <div class="fracture-badge">Spiral Fracture</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

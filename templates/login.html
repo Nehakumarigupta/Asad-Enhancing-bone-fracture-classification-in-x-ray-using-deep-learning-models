@@ -1,0 +1,414 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('index')}}">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('register')}}">
+            <i class="fas fa-user-plus"></i> Register
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{url_for('login')}}">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<style>
+    .login-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 100px 20px 50px;
+    }
+
+    .login-container {
+        max-width: 550px;
+        width: 100%;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 30px;
+        padding: 60px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        animation: fadeInScale 0.8s ease;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 45px;
+    }
+
+    .login-icon {
+        font-size: 5rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+
+    .login-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+    }
+
+    .login-subtitle {
+        font-size: 1.15rem;
+        color: #666;
+        font-weight: 400;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 18px 25px 18px 55px;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+        background: #f8f9fa;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(111, 190, 219, 0.15);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.3rem;
+        color: var(--secondary-color);
+        pointer-events: none;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #999;
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: var(--primary-color);
+    }
+
+    .forgot-password {
+        text-align: right;
+        margin-top: -15px;
+        margin-bottom: 25px;
+    }
+
+    .forgot-password-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .forgot-password-link:hover {
+        color: var(--accent-color);
+        text-decoration: underline;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 18px;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(44, 95, 124, 0.5);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .form-footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #e9ecef;
+    }
+
+    .form-footer-text {
+        font-size: 1.05rem;
+        color: #666;
+    }
+
+    .form-footer-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .form-footer-link:hover {
+        color: var(--accent-color);
+        text-decoration: underline;
+    }
+
+    .features-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 20px;
+        margin-top: 30px;
+        color: white;
+        text-align: center;
+    }
+
+    .features-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+    }
+
+    .feature-icon {
+        font-size: 1.8rem;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        border: 2px solid #f5c6cb;
+        color: #721c24;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    @media (max-width: 768px) {
+        .login-card {
+            padding: 40px 30px;
+        }
+
+        .login-title {
+            font-size: 2.2rem;
+        }
+
+        .login-icon {
+            font-size: 4rem;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="login-section">
+    <div class="container login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h1 class="login-title">Welcome Back</h1>
+                <p class="login-subtitle">Sign in to access your BoneCare AI dashboard</p>
+            </div>
+
+            {% if message %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle" style="font-size: 1.5rem;"></i>
+                <span>{{message}}</span>
+            </div>
+            {% endif %}
+
+            <form action="{{url_for('login')}}" method="post" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <div style="position: relative;">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="Enter your email address" 
+                            required
+                            autocomplete="email"
+                            id="emailInput"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <div style="position: relative;">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Enter your password" 
+                            required
+                            autocomplete="current-password"
+                            id="passwordInput"
+                        >
+                        <i class="fas fa-eye password-toggle" id="passwordToggle" onclick="togglePassword()"></i>
+                    </div>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#" class="forgot-password-link">
+                        <i class="fas fa-question-circle"></i> Forgot Password?
+                    </a>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+
+            <div class="form-footer">
+                <p class="form-footer-text">
+                    Don't have an account? 
+                    <a href="{{url_for('register')}}" class="form-footer-link">
+                        <i class="fas fa-user-plus"></i> Create One Now
+                    </a>
+                </p>
+            </div>
+
+            <div class="features-section">
+                <h3 class="features-title">
+                    <i class="fas fa-star"></i> Access Premium Features
+                </h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-brain feature-icon"></i>
+                        <span>AI Fracture Detection</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-robot feature-icon"></i>
+                        <span>Medical Chatbot</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line feature-icon"></i>
+                        <span>Detailed Reports</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <span>Secure Platform</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordToggle = document.getElementById('passwordToggle');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggle.classList.remove('fa-eye');
+            passwordToggle.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            passwordToggle.classList.remove('fa-eye-slash');
+            passwordToggle.classList.add('fa-eye');
+        }
+    }
+
+    // Auto-focus email input
+    document.getElementById('emailInput').focus();
+
+    // Add enter key support
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('loginForm').submit();
+        }
+    });
+</script>
+{% endblock %}

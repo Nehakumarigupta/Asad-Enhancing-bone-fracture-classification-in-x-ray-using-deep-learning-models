@@ -1,0 +1,433 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('home')}}">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('about')}}">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{url_for('prediction')}}">
+            <i class="fas fa-x-ray"></i> Prediction
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('chatbot')}}">
+            <i class="fas fa-robot"></i> AI Assistant
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('index')}}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<style>
+    .prediction-section {
+        min-height: 100vh;
+        padding: 100px 20px 50px;
+    }
+
+    .prediction-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .upload-card {
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 40px;
+    }
+
+    .upload-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.8rem;
+        text-align: center;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 30px;
+    }
+
+    .upload-area {
+        border: 3px dashed var(--accent-color);
+        border-radius: 20px;
+        padding: 50px;
+        text-align: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 10%);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .upload-area:hover {
+        border-color: var(--primary-color);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 10%);
+        transform: scale(1.02);
+    }
+
+    .upload-icon {
+        font-size: 5rem;
+        color: var(--secondary-color);
+        margin-bottom: 20px;
+    }
+
+    .upload-text {
+        font-size: 1.3rem;
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .upload-btn {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 15px 50px;
+        border-radius: 50px;
+        border: none;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(44, 95, 124, 0.4);
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        box-shadow: var(--shadow-lg);
+        margin-top: 40px;
+        display: none;
+    }
+
+    .result-image {
+        max-width: 400px;
+        max-height: 400px;
+        border-radius: 15px;
+        box-shadow: var(--shadow-md);
+        margin: 0 auto 30px;
+        display: block;
+    }
+
+    .result-title {
+        font-size: 2rem;
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .prediction-result {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .fracture-info-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 40px;
+        border-radius: 20px;
+        margin-top: 30px;
+    }
+
+    .info-section {
+        margin-bottom: 25px;
+    }
+
+    .info-title {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        font-weight: 700;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-text {
+        font-size: 1.1rem;
+        color: #555;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: white;
+    }
+
+    .spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid var(--primary-color);
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<section class="prediction-section">
+    <div class="container prediction-container">
+        <div class="upload-card">
+            <h1 class="upload-title">
+                <i class="fas fa-x-ray"></i> AI Fracture Detection
+            </h1>
+            <p style="text-align: center; color: #666; font-size: 1.2rem; margin-bottom: 40px;">
+                Upload an X-ray image to receive instant AI-powered fracture classification and detailed medical insights
+            </p>
+
+            <form id="predictionForm" action="{{url_for('prediction')}}" method="post" enctype="multipart/form-data">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <p class="upload-text">
+                        <strong>Click to browse</strong> or drag and drop your X-ray image here
+                    </p>
+                    <p style="color: #999; font-size: 0.95rem;">Supported formats: JPG, JPEG, PNG | Max size: 10MB</p>
+                    <input type="file" id="fileInput" name="img" class="file-input" accept="image/*" required onchange="displayFileName()">
+                    <p id="fileName" style="margin-top: 15px; color: var(--primary-color); font-weight: 600;"></p>
+                </div>
+                <div style="text-align: center;">
+                    <button type="submit" class="upload-btn">
+                        <i class="fas fa-brain"></i> Analyze X-Ray
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div id="uploadedImage" style="display:none;">
+                <img id="image" src="" class="result-image">
+            </div>
+
+            <div id="result"></div>
+
+            <div id="fractureInfo" class="fracture-info-card" style="display: none;"></div>
+        </div>
+    </div>
+</section>
+
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <h2>Analyzing X-Ray Image...</h2>
+        <p>Our AI is processing your image. Please wait.</p>
+    </div>
+</div>
+
+<script>
+    const fractureInformation = {
+        'Avulsion fracture': {
+            description: 'An avulsion fracture occurs when a small chunk of bone attached to a tendon or ligament gets pulled away from the main part of the bone. This type of fracture is common in young athletes and typically occurs during sudden, forceful muscle contractions.',
+            symptoms: 'Sudden pain at the injury site, swelling, bruising, limited range of motion, and visible deformity in severe cases.',
+            treatment: 'Most avulsion fractures are treated conservatively with rest, ice, compression, and elevation (RICE protocol). Severe cases may require surgical reattachment of the bone fragment.',
+            recovery: 'Recovery typically takes 6-12 weeks with proper immobilization and physical therapy. Athletes should avoid high-impact activities during healing.',
+            icon: 'fa-bone'
+        },
+        'Comminuted fracture': {
+            description: 'A comminuted fracture is a severe break where the bone shatters into three or more fragments. These fractures often result from high-energy trauma such as car accidents or falls from significant heights.',
+            symptoms: 'Severe pain, significant swelling, visible deformity, inability to move the affected limb, and potential nerve or vascular damage.',
+            treatment: 'Treatment usually requires surgical intervention (open reduction and internal fixation) to realign and stabilize bone fragments using plates, screws, or external fixation devices.',
+            recovery: 'Recovery is lengthy, often requiring 3-6 months or longer. Extensive physical therapy is necessary to restore function and prevent complications like arthritis.',
+            icon: 'fa-puzzle-piece'
+        },
+        'Fracture Dislocation': {
+            description: 'A fracture dislocation involves both a broken bone and dislocation of a nearby joint. This complex injury commonly affects the ankle, shoulder, elbow, or hip and represents a serious orthopedic emergency.',
+            symptoms: 'Severe pain, obvious deformity, swelling, inability to move the joint, numbness or tingling indicating nerve involvement.',
+            treatment: 'Immediate medical attention is critical. Treatment involves reduction (realignment) of the joint followed by surgical fixation of the fracture. Emergency assessment for neurovascular damage is essential.',
+            recovery: 'Recovery typically requires 4-8 months with intensive rehabilitation. Long-term complications may include arthritis, chronic instability, or reduced range of motion.',
+            icon: 'fa-compress'
+        },
+        'Greenstick fracture': {
+            description: 'A greenstick fracture is an incomplete fracture where the bone bends and cracks but doesn\'t break completely through. This fracture type occurs almost exclusively in children due to their softer, more flexible bones.',
+            symptoms: 'Moderate pain, mild swelling, tenderness at the fracture site, and slight deformity. The limb may still be partially functional.',
+            treatment: 'Treatment typically involves immobilization with a cast or splint for 4-6 weeks. Complete breaks may require manipulation to realign the bone before casting.',
+            recovery: 'Children heal quickly, usually within 4-8 weeks. Prognosis is excellent with minimal risk of complications due to the incomplete nature of the fracture.',
+            icon: 'fa-leaf'
+        },
+        'Hairline Fracture': {
+            description: 'A hairline fracture (stress fracture) is a tiny crack in the bone caused by repetitive stress or overuse. Common in athletes and military recruits, these fractures develop gradually rather than from a single traumatic event.',
+            symptoms: 'Gradual onset of pain that worsens with activity and improves with rest, localized tenderness, mild swelling, and pain during weight-bearing.',
+            treatment: 'Treatment focuses on rest and activity modification. Immobilization may be needed in some cases. Non-steroidal anti-inflammatory drugs (NSAIDs) help manage pain.',
+            recovery: 'Healing typically takes 6-8 weeks with proper rest. Gradual return to activity is essential to prevent re-injury. Addressing underlying biomechanical issues is crucial.',
+            icon: 'fa-minus'
+        },
+        'Impacted fracture': {
+            description: 'An impacted fracture occurs when broken bone ends are driven into each other, causing compression. Common in the hip (femoral neck) and wrist, this fracture type is often seen in elderly patients with osteoporosis.',
+            symptoms: 'Pain at the fracture site, limited mobility, swelling, and shortening or rotation of the affected limb. Pain may be less severe than other fracture types initially.',
+            treatment: 'Treatment depends on location and severity. Hip fractures often require surgical fixation. Wrist impacted fractures may be treated with casting if alignment is acceptable.',
+            recovery: 'Recovery varies by location: wrist fractures heal in 6-8 weeks, while hip fractures require 3-6 months. Elderly patients need comprehensive rehabilitation to regain mobility.',
+            icon: 'fa-compress-arrows-alt'
+        },
+        'Longitudinal fracture': {
+            description: 'A longitudinal fracture runs along the length of the bone parallel to its long axis. This uncommon fracture pattern often results from high-energy trauma or combined force mechanisms.',
+            symptoms: 'Significant pain along the bone length, swelling, difficulty bearing weight or using the affected limb, and potential instability.',
+            treatment: 'Treatment typically requires surgical intervention due to instability. Internal fixation with intramedullary rods or plates ensures proper alignment and healing.',
+            recovery: 'Recovery generally takes 3-6 months depending on bone involved and fracture complexity. Physical therapy is essential for restoring full function.',
+            icon: 'fa-arrows-alt-v'
+        },
+        'Oblique fracture': {
+            description: 'An oblique fracture has an angled pattern across the bone, typically resulting from a twisting force or angled impact. The diagonal break line distinguishes this from transverse fractures.',
+            symptoms: 'Sharp pain, swelling, bruising, visible deformity, and inability to bear weight or use the affected limb normally.',
+            treatment: 'Treatment depends on stability and alignment. Stable fractures may be treated with casting, while unstable oblique fractures require surgical fixation with screws or plates.',
+            recovery: 'Healing typically requires 6-12 weeks. The angled fracture line can be unstable, so compliance with weight-bearing restrictions is critical for proper healing.',
+            icon: 'fa-slash'
+        },
+        'Pathological fracture': {
+            description: 'A pathological fracture occurs in bone weakened by underlying disease such as osteoporosis, cancer, infection, or metabolic bone disorders. These fractures happen with minimal trauma or spontaneously.',
+            symptoms: 'Pain often precedes the fracture, sudden sharp pain with minimal trauma, swelling, and functional impairment. May be accompanied by symptoms of underlying disease.',
+            treatment: 'Treatment addresses both the fracture and underlying condition. May involve surgical stabilization, radiation therapy for tumors, or medications to strengthen bone.',
+            recovery: 'Recovery depends on the underlying pathology. Cancer-related fractures have guarded prognosis, while osteoporotic fractures heal in 8-16 weeks with appropriate treatment of bone disease.',
+            icon: 'fa-disease'
+        },
+        'Spiral Fracture': {
+            description: 'A spiral fracture results from a twisting force applied to a bone, creating a fracture line that spirals around the bone shaft like a corkscrew. Common in skiing accidents and contact sports.',
+            symptoms: 'Severe pain, rapid swelling, visible deformity, inability to move or bear weight, and potential neurovascular compromise in severe cases.',
+            treatment: 'Treatment usually requires surgical intervention with intramedullary nailing or plate fixation due to the instability of the fracture pattern. Proper rotational alignment is critical.',
+            recovery: 'Healing typically takes 3-6 months. Physical therapy focuses on restoring strength and range of motion. The twisting mechanism often damages surrounding soft tissues, prolonging recovery.',
+            icon: 'fa-sync-alt'
+        }
+    };
+
+    function displayFileName() {
+        const input = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        if (input.files.length > 0) {
+            fileName.textContent = `Selected: ${input.files[0].name}`;
+        }
+    }
+
+    const form = document.getElementById('predictionForm');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        loadingOverlay.style.display = 'flex';
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch('/prediction', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            loadingOverlay.style.display = 'none';
+
+            const resultCard = document.getElementById('resultCard');
+            const resultDiv = document.getElementById('result');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const imageElement = document.getElementById('image');
+            const fractureInfo = document.getElementById('fractureInfo');
+
+            if (result.predicted_class) {
+                resultCard.style.display = 'block';
+                uploadedImage.style.display = 'block';
+                imageElement.src = `/static/saves_images/${result.file_name}`;
+
+                resultDiv.innerHTML = `
+                    <h2 class="result-title">
+                        <i class="fas fa-check-circle" style="color: #28a745;"></i> Analysis Complete
+                    </h2>
+                    <div class="prediction-result">
+                        <i class="fas fa-bone"></i> ${result.predicted_class}
+                    </div>
+                `;
+
+                // Display fracture information
+                const info = fractureInformation[result.predicted_class];
+                if (info) {
+                    fractureInfo.style.display = 'block';
+                    fractureInfo.innerHTML = `
+                        <h3 class="info-title">
+                            <i class="fas ${info.icon}"></i> Detailed Fracture Information
+                        </h3>
+                        <div class="info-section">
+                            <h4 class="info-title"><i class="fas fa-info-circle"></i> Description</h4>
+                            <p class="info-text">${info.description}</p>
+                        </div>
+                        <div class="info-section">
+                            <h4 class="info-title"><i class="fas fa-notes-medical"></i> Symptoms</h4>
+                            <p class="info-text">${info.symptoms}</p>
+                        </div>
+                        <div class="info-section">
+                            <h4 class="info-title"><i class="fas fa-pills"></i> Treatment</h4>
+                            <p class="info-text">${info.treatment}</p>
+                        </div>
+                        <div class="info-section">
+                            <h4 class="info-title"><i class="fas fa-heartbeat"></i> Recovery Timeline</h4>
+                            <p class="info-text">${info.recovery}</p>
+                        </div>
+                        <div style="background: rgba(255, 193, 7, 0.2); padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ffc107;">
+                            <p style="margin: 0; color: #856404; font-weight: 600;">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> This AI-generated diagnosis is for informational purposes only. Always consult with a qualified healthcare professional for proper medical evaluation and treatment planning.
+                            </p>
+                        </div>
+                    `;
+                }
+
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="background: #dc3545; color: white; padding: 30px; border-radius: 15px; text-align: center;">
+                        <i class="fas fa-times-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h2>Error: ${result.error || 'Unknown error occurred'}</h2>
+                        <p>Please try uploading a different X-ray image.</p>
+                    </div>
+                `;
+                fractureInfo.style.display = 'none';
+            }
+        } catch (error) {
+            loadingOverlay.style.display = 'none';
+            alert('Error processing image. Please try again.');
+            console.error('Error:', error);
+        }
+    });
+</script>
+{% endblock %}
