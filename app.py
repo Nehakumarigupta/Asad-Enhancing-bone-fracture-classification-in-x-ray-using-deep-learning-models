@@ -27,7 +27,7 @@ app.secret_key = 'animals'
 
 
 # Configure Gemini API
-GEMINI_API_KEY = "AIzaSyA2Z2RxqBpt8kCcW2FD8_dBO5Vv9pSLZYk"  # Replace with your actual API key
+GEMINI_API_KEY = ""  # Replace with your actual API key
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Initialize Gemini model (using the correct model name)
@@ -258,3 +258,4 @@ def clear_chat():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
