@@ -79,7 +79,8 @@ CREATE TABLE `users` (
 );
 
 
-**Installation and Setup**
+## **Installation and Setup** 🛠️
+
 1. Clone the Repository
 git clone https://github.com/your-username/your-repository-name.git
 cd your-repository-name
@@ -95,47 +96,51 @@ mydb = mysql.connector.connect(
     port="3306",
     database="animals"
 )
-4. Configure Gemini API Key
+
+**4. Configure Gemini API Key**
+
 Add your Google Gemini API key in the Python file:
 
 GEMINI_API_KEY = "your-api-key-here"
 Note: Do not expose your real API key in a public GitHub repository.
 
-5. Add Required Model Files
+**5. Add Required Model Files**
 Make sure the following trained model files are available in the project directory:
 
 vgg19_random_forest.joblib
 vgg19_scaler.joblib
-6. Run the Application
+
+**6. Run the Application**
 python app.py
-7. Open in Browser
+
+**7. Open in Browser**
 http://127.0.0.1:5000/
 Project Modules
 User Authentication
 The application allows users to register and log in using their name, email, and password. User details are stored in a MySQL database.
 
-**Fracture Prediction**
+## **Fracture Prediction**
 The prediction module accepts an X-ray image as input, preprocesses the image, extracts features using VGG19, and predicts the fracture type using a trained Random Forest classifier.
 
-**AI Chatbot**
+## **AI Chatbot**
 The chatbot module uses Google Gemini API to provide AI-based responses to user queries. Chat history is maintained using Flask sessions.
 
-**Applications**
+## **Applications**
 Medical image analysis learning projects
 Bone fracture classification research
 Deep learning-based healthcare applications
 Academic and final-year project demonstrations
-**Limitations**
+## **Limitations**
 The system depends on the quality of uploaded X-ray images.
 Prediction accuracy depends on the training dataset and trained model.
 The application is intended for educational and research purposes only.
 It should not be used as a replacement for professional medical diagnosis.
-**Future Scope**
+## **Future Scope**
 Improve model accuracy using a larger medical image dataset
 Add doctor/admin dashboard
 Store prediction history in the database
 Deploy the application on a cloud platform
 Add support for more medical image categories
 Improve security using password hashing and environment variables
-**Disclaimer**
+## **Disclaimer**
 This project is developed for educational and research purposes only. The prediction results should not be considered as professional medical advice. Always consult a qualified medical professional for diagnosis and treatment.
