@@ -2,21 +2,24 @@
 
 ## Overview
 
-Enhancing Bone Fracture Detection in X-ray Images Using Deep Learning Model is a web-based application developed using Flask. The system is designed to detect and classify different types of bone fractures from X-ray images using deep learning-based feature extraction and machine learning classification.
+**Enhancing Bone Fracture Detection in X-ray Images Using Deep Learning Model** is a web-based application developed using Python and Flask. The main objective of this project is to detect and classify different types of bone fractures from X-ray images using deep learning and machine learning techniques.
 
-The project uses the VGG19 deep learning model for extracting image features and a trained Random Forest classifier for predicting the fracture type. It also includes user authentication, MySQL database integration, and an AI chatbot powered by Google Gemini API.
+The system uses the **VGG19 deep learning model** for feature extraction and a trained **Random Forest classifier** for fracture type prediction. In addition to fracture detection, the application also includes user registration, login authentication, MySQL database connectivity, image upload functionality, and an AI chatbot powered by Google Gemini API.
+
+This project demonstrates how artificial intelligence can be applied in the healthcare domain, especially for medical image analysis and computer-aided fracture detection.
 
 ## Key Features
 
-- Secure user registration and login system
+- User registration and login system
+- MySQL database connectivity
 - X-ray image upload functionality
-- Bone fracture type prediction
-- VGG19-based deep feature extraction
-- Random Forest-based classification
-- MySQL database integration
-- AI chatbot support using Google Gemini API
-- Web-based interface built with Flask
+- Image preprocessing before prediction
+- Deep feature extraction using VGG19
+- Fracture classification using Random Forest
+- AI chatbot integration using Google Gemini API
 - Session-based user management
+- Web-based user interface using Flask
+- Educational and research-oriented medical image analysis system
 
 ## Technologies Used
 
@@ -38,13 +41,13 @@ The project uses the VGG19 deep learning model for extracting image features and
 
 ## System Workflow
 
-1. The user registers or logs in to the web application.
+1. The user registers or logs in to the application.
 2. The user uploads an X-ray image.
-3. The image is preprocessed and resized.
-4. VGG19 extracts important features from the uploaded X-ray image.
+3. The uploaded image is resized and preprocessed.
+4. VGG19 extracts deep image features from the X-ray image.
 5. The extracted features are scaled using a trained scaler.
-6. The Random Forest model predicts the fracture type.
-7. The predicted result is displayed to the user.
+6. The trained Random Forest classifier predicts the fracture type.
+7. The predicted fracture result is displayed to the user.
 8. The user can also interact with the AI chatbot for assistance.
 
 ## Fracture Classes
@@ -64,7 +67,7 @@ The system can classify the following fracture types:
 
 ## Database Setup
 
-Create a MySQL database using the following SQL script:
+Create the MySQL database using the following SQL script:
 
 ```sql
 DROP DATABASE IF EXISTS `animals`;
@@ -77,16 +80,15 @@ CREATE TABLE `users` (
     `email` VARCHAR(1000),
     `password` VARCHAR(225)
 );
-
-
-## **Installation and Setup** 🛠️
-
+Installation and Setup
 1. Clone the Repository
 git clone https://github.com/your-username/your-repository-name.git
 cd your-repository-name
 2. Install Required Dependencies
 pip install flask mysql-connector-python numpy tensorflow scikit-learn joblib pillow google-generativeai werkzeug
 3. Configure MySQL Database
+Make sure MySQL is installed and running on your system. Then create the database using the SQL script provided above.
+
 Update the database connection in the Python file if required:
 
 mydb = mysql.connector.connect(
@@ -96,51 +98,53 @@ mydb = mysql.connector.connect(
     port="3306",
     database="animals"
 )
-
-**4. Configure Gemini API Key**
-
+4. Configure Gemini API Key
 Add your Google Gemini API key in the Python file:
 
 GEMINI_API_KEY = "your-api-key-here"
-Note: Do not expose your real API key in a public GitHub repository.
+Note: Do not expose your real API key in a public GitHub repository. For better security, use environment variables.
 
-**5. Add Required Model Files**
-Make sure the following trained model files are available in the project directory:
+5. Add Required Model Files
+Make sure the trained model and scaler files are available in the project directory:
 
 vgg19_random_forest.joblib
 vgg19_scaler.joblib
-
-**6. Run the Application**
+6. Run the Application
 python app.py
+7. Open the Application
+Open the following URL in your browser:
 
-**7. Open in Browser**
 http://127.0.0.1:5000/
 Project Modules
-User Authentication
-The application allows users to register and log in using their name, email, and password. User details are stored in a MySQL database.
+User Authentication Module
+This module allows users to register and log in to the application. User details such as name, email, and password are stored in the MySQL database.
 
-## **Fracture Prediction**
-The prediction module accepts an X-ray image as input, preprocesses the image, extracts features using VGG19, and predicts the fracture type using a trained Random Forest classifier.
+Fracture Prediction Module
+This module allows users to upload X-ray images. The uploaded image is preprocessed and passed through the VGG19 model for feature extraction. The extracted features are then classified using a trained Random Forest model to predict the fracture type.
 
-## **AI Chatbot**
-The chatbot module uses Google Gemini API to provide AI-based responses to user queries. Chat history is maintained using Flask sessions.
+Chatbot Module
+This module uses Google Gemini API to provide AI-based chatbot responses. Users can interact with the chatbot after logging in to the application.
 
-## **Applications**
-Medical image analysis learning projects
+Applications
+Medical image analysis projects
 Bone fracture classification research
 Deep learning-based healthcare applications
-Academic and final-year project demonstrations
-## **Limitations**
-The system depends on the quality of uploaded X-ray images.
-Prediction accuracy depends on the training dataset and trained model.
-The application is intended for educational and research purposes only.
-It should not be used as a replacement for professional medical diagnosis.
-## **Future Scope**
-Improve model accuracy using a larger medical image dataset
+Academic mini projects and major projects
+Final-year project demonstrations
+Future Scope
+Improve model accuracy using a larger X-ray dataset
 Add doctor/admin dashboard
 Store prediction history in the database
+Add password hashing for better security
+Use environment variables for API keys and database credentials
 Deploy the application on a cloud platform
 Add support for more medical image categories
-Improve security using password hashing and environment variables
-## **Disclaimer**
-This project is developed for educational and research purposes only. The prediction results should not be considered as professional medical advice. Always consult a qualified medical professional for diagnosis and treatment.
+Generate downloadable prediction reports
+Limitations
+Prediction accuracy depends on the quality of the uploaded X-ray image.
+The model performance depends on the dataset used for training.
+The system is not intended for real-time clinical diagnosis.
+The application requires trained model files to make predictions.
+Internet access may be required for chatbot functionality.
+Disclaimer
+This project is developed for educational and research purposes only. The prediction results generated by this system should not be considered as professional medical advice. Always consult a qualified medical professional for diagnosis and treatment.
